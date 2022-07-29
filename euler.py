@@ -1,48 +1,43 @@
-import threading
-import time
- 
-from queue import Queue
-from xml.dom.expatbuilder import theDOMImplementation
+from multiprocessing import Pool, cpu_count
+import sys  # para a recursiva
+import time  # para calcular o tempo
 
-
-
-
-def euler(i,fila):
-
-    e=1/fatorial(i)
-    fila.put(e)
-    # print(e)
+def euler(i):
+    e = 1/fatorial(i)
+    return e
+    # fila.put(e)
 
 def fatorial(n):
-    resultado=1
-    for i in range(1,n+1):
-        resultado *= i
-    return resultado
+    if n == 0:
+        return 1
+    else:
+        return n * fatorial(n-1)
 
 
-
-
-
-fila=Queue()
-
-inicio=time.time()
-threads=[]
-x=int(input("quantas vezes quer repertir: "))
-for i in range(0,x+1):
-    # t=threading.Thread(target=euler,args=(x,fila))
-    #if sum(fila.queue)<2.718281828459045:  
-    t=threading.Thread(target=euler(i,fila))
-    threads.append(t)
-    t.start()
-   # t.join()
-    # else:
-    #     print("ja era")
-    #     break
+sys.setrecursionlimit(1000000)
+def main():
+    #x = int(input("quantas vezes quer calcular: "))
+    #y = int(input("quantas threads: "))
+    x=10000
+    y=2
+    inicio = time.time()
+   
+    with Pool(y) as p:
+        resultado=p.map(euler, range(0,x+1))
+    somatorio=sum(resultado)
+    print("Total: ",somatorio)
     
-for t in threads:
-    t.join()
+    fim = time.time()
+    tempo = fim-inicio
     
-somatorio=sum(fila.queue)
-print(somatorio)
-fim=time.time()
+    print ("utlizando pool: " + str(tempo) + 'resultado: ' + str(somatorio))
+   
 
+    vetor1=[]
+    inicio1=time.time()
+    for cont in range(0,x+1):
+        vetor1.append(euler(cont))
+   
+    print("tempo sem thraeads: " + str(time.time()-inicio1) + "resultado: " + str(sum(vetor1)))
+if __name__ == "__main__":
+    main()
